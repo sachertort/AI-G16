@@ -26,7 +26,7 @@ for sample in train:
             subdata = re.sub(r"([,\.!\?]+)", r" ", subdata)
             subdata = re.sub(r"\s+", r" ", subdata).strip()
             conversation_splitted.append(subdata)
-    
+
     sample["conversation_strip"] = conversation_splitted
 
 
@@ -57,31 +57,34 @@ for sample in train:
                     substr = new_s[:comma_id].replace(" ,", "") + "."
                     substr = substr.replace("  ", " ")
                     substr = substr.replace(" .", ".")
-                    after_substr = new_s[comma_id + 2:].replace("  ", " ")
+                    after_substr = new_s[comma_id + 2 :].replace("  ", " ")
                     after_substr = after_substr.replace(" .", ".")
                     if substr in segmented_dialog or after_substr in segmented_dialog:
                         to_add = new_s[:comma_id] + "."
                         to_add = to_add.replace("  ", " , ")
                         to_add = to_add.replace(" .", " ,")
                         new_sents.append(to_add)
-                        new_s = new_s[comma_id + 2:]
+                        new_s = new_s[comma_id + 2 :]
                     else:
-                        new_s = new_s[:comma_id] + new_s[comma_id + 1:]
+                        new_s = new_s[:comma_id] + new_s[comma_id + 1 :]
 
             except Exception:
                 pass
-            
+
             to_add = new_s.replace("  ", " , ")
             new_sents.append(to_add)
             for sent in new_sents:
-                conversation_edu.append({"utterance_ID": sample["conversation"][i]["utterance_ID"],
-                                         "text": sent,
-                                         "speaker": sample["conversation"][i]["speaker"],
-                                         "emotion": sample["conversation"][i]["emotion"]
-                                         })
-    
+                conversation_edu.append(
+                    {
+                        "utterance_ID": sample["conversation"][i]["utterance_ID"],
+                        "text": sent,
+                        "speaker": sample["conversation"][i]["speaker"],
+                        "emotion": sample["conversation"][i]["emotion"],
+                    }
+                )
+
     sample["conversation_edu"] = conversation_edu
 
 
 with open("train_with_edus.json", "w") as f:
-   json.dump(train, f)
+    json.dump(train, f)
