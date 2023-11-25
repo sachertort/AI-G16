@@ -1,0 +1,4 @@
+git+https://github.com/Kpetyxova/DeepPavlov.git@add/emo_clf
+datasets==2.15.0
+gdown==4.7.1
+spacy==3.7.2
