@@ -7,12 +7,13 @@ pip install -r requirements.txt
 
 ## Emotion classifier
 
-### Train
+### Trained model
 
 ```
 gdown 1-8URvi1jyCVQIknHA5gQaEkpVWOJydha -O src/emotion_classifier/
 ```
 
+### Train
 ```
 python src/emotion_classifier/train.py > log.log 2>&1
 ```
