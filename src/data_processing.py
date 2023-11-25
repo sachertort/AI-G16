@@ -103,10 +103,10 @@ class DialogDataset(Dataset):
     def get(self, idx: int):
         return self.data_list[idx]
 
-def get_dataset(data: dict) -> DialogDataset:
+def get_dataset(data: dict, test: bool=False) -> DialogDataset:
     dataset = []
     for dialog in tqdm(data):
         if dialog["conversation"]:
-            dataset.append(get_graph(dialog, window=None))
+            dataset.append(get_graph(dialog, window=None, test=test))
     dataset = DialogDataset(dataset)
     return dataset
