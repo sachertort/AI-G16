@@ -1,9 +1,8 @@
-import json
-
 from torch_geometric.loader import DataLoader
 import torch
 from torch.optim import Adam
 from torch import nn
+import torch.nn.functional as F
 from sklearn.metrics import f1_score
 
 from data_processing import read_json, get_dataset
@@ -11,6 +10,7 @@ from graph_models import ConversationGAT
 
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 def train_model():
     train_file = "data/Subtask_1_train_real.json"
@@ -28,9 +28,7 @@ def train_model():
     loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
     model = ConversationGAT().to(DEVICE)
-    optimizer = Adam(model.parameters(),
-                    lr=learning_rate,
-                    weight_decay=weight_decay)
+    optimizer = Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     loss_func = nn.CrossEntropyLoss()
     best_metric = 0
 
@@ -58,9 +56,12 @@ def train_model():
                 best_metric = metric
                 torch.save(model.state_dict(), "models/new_best_model.pth")
             if epoch % 10 == 0:
-                print(f"""Epoch {epoch+1}/{num_epochs}, Train Loss: {round(loss.item(), 2)}, Validation F1: {round(metric, 2)}""")
+                print(
+                    f"""Epoch {epoch+1}/{num_epochs}, Train Loss: {round(loss.item(), 2)}, Validation F1: {round(metric, 2)}"""
+                )
     print("Best Validation F1:", round(best_metric, 2))
     model.load_state_dict(torch.load("models/new_best_model.pth"))
+
 
 if __name__ == "__main__":
     train_model()

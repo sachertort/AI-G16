@@ -10,15 +10,18 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 BERT_TOKENIZER = BertTokenizer.from_pretrained("bert-base-uncased")
 
-BERT_MODEL = BertModel.from_pretrained("bert-base-uncased").to(DEVICE)
+BERT_MODEL = BertModel.from_pretrained("bert-base-uncased", output_hidden_states=True).to(DEVICE)
+
 
 def read_json(file_name: str) -> list:
     with open(file_name, "r") as f:
         return json.load(f)
 
+
 def write_json(file_name: str, dataset: list) -> list:
     with open(file_name, "w") as f:
         return json.dump(dataset, f)
+
 
 def get_cause_relations(dialogs: list) -> None:
     for d in tqdm(dialogs):
@@ -31,6 +34,7 @@ def get_cause_relations(dialogs: list) -> None:
             if cause_position <= target_position:
                 d["cause_relations"].append((cause_position, target_position))
 
+
 def get_sentence_embeddings(sentences: list) -> torch.Tensor:
     encoded_input = BERT_TOKENIZER(sentences, padding=True, truncation=True, return_tensors="pt")
     encoded_input = {key: val.to(DEVICE) for key, val in encoded_input.items()}
@@ -39,9 +43,11 @@ def get_sentence_embeddings(sentences: list) -> torch.Tensor:
     embeddings = outputs.hidden_states[-2].mean(dim=1)
     return embeddings
 
+
 def get_emotions_tensor(emotion_list: list) -> torch.Tensor:
     conversation_emotions = [0 if emotion == "neutral" else 1 for emotion in emotion_list]
     return torch.tensor(conversation_emotions, dtype=torch.long)
+
 
 def get_speakers_tensor(speaker_list: list) -> torch.Tensor:
     speaker_to_idx = {speaker: idx for idx, speaker in enumerate(sorted(set(speaker_list)))}
@@ -50,9 +56,8 @@ def get_speakers_tensor(speaker_list: list) -> torch.Tensor:
         one_hot_encoded_fixed[i, speaker_to_idx[speaker]] = 1
     return one_hot_encoded_fixed
 
-def get_graph(dialog: dict,
-              test: bool=False, 
-              window=None) -> Data:
+
+def get_graph(dialog: dict, test: bool = False, window=None) -> Data:
     texts_list = []
     emotions_list = []
     speakers_list = []
@@ -66,10 +71,14 @@ def get_graph(dialog: dict,
     x = get_sentence_embeddings(texts_list)
     if not window:
         window = length
-    edge_index = torch.tensor([[i, j] for i in range(x.size(0))\
-                               for j in range(x.size(0)) if (i <= j) &\
-                               (j - i <= window)],
-                              dtype=torch.long).t().contiguous()
+    edge_index = (
+        torch.tensor(
+            [[i, j] for i in range(x.size(0)) for j in range(x.size(0)) if (i <= j) & (j - i <= window)],
+            dtype=torch.long,
+        )
+        .t()
+        .contiguous()
+    )
     edge_attr = get_speakers_tensor(speakers_list)
 
     if not test:
@@ -79,18 +88,13 @@ def get_graph(dialog: dict,
         for i, edge in enumerate(edge_index.t()):
             if any(torch.all(edge == special_connection, dim=0) for special_connection in cause_relations_tensor):
                 y[i] = emotions[edge[1]]
-        data_entry = Data(x=x,
-                          edge_index=edge_index,
-                          edge_attr=edge_attr,
-                          y=y,
-                          emotions=emotions).to(DEVICE)
-        
+        data_entry = Data(x=x, edge_index=edge_index, edge_attr=edge_attr, y=y, emotions=emotions).to(DEVICE)
+
     else:
-        data_entry = Data(x=x,
-                          edge_index=edge_index,
-                          edge_attr=edge_attr).to(DEVICE)
+        data_entry = Data(x=x, edge_index=edge_index, edge_attr=edge_attr).to(DEVICE)
 
     return data_entry
+
 
 class DialogDataset(Dataset):
     def __init__(self, data_list: list):
@@ -103,7 +107,8 @@ class DialogDataset(Dataset):
     def get(self, idx: int):
         return self.data_list[idx]
 
-def get_dataset(data: dict, test: bool=False) -> DialogDataset:
+
+def get_dataset(data: dict, test: bool = False) -> DialogDataset:
     dataset = []
     for dialog in tqdm(data):
         if dialog["conversation"]:

@@ -7,8 +7,8 @@ from deeppavlov import build_model
 from sklearn.metrics import classification_report
 from tqdm.auto import tqdm
 
-from src.data_processing import read_json, get_dataset
-from src.graph_models import ConversationGAT
+from data_processing import read_json, get_dataset
+from graph_models import ConversationGAT
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 EMOTIONS = ["anger", "disgust", "fear", "joy", "sadness", "surprise"]
@@ -37,9 +37,10 @@ def get_predictions(model, test_loader, test_data, classification_model):
                         emotion_type = classification_model([""], [emotion_utterance_text])[0]
                     else:
                         emotion_type = classification_model([cause_utterance_text], [emotion_utterance_text])[0]
-                    dialog_pred_pairs.append((str(cause_id + 1), str(emotion_id + 1), emotion_type)) # 
+                    dialog_pred_pairs.append((str(cause_id + 1), str(emotion_id + 1), emotion_type))  #
             pred_pairs.append(dialog_pred_pairs)
     return pred_pairs
+
 
 def get_golds(data):
     gold_pairs = []
@@ -51,6 +52,7 @@ def get_golds(data):
             dialog_gold_pairs.append((cause_utterance_id, emotion_utterance_id, emotion_type))
         gold_pairs.append(dialog_gold_pairs)
     return gold_pairs
+
 
 def preparee4evaluation(gold_pairs, pred_pairs):
     gold4eval = []
@@ -80,6 +82,7 @@ def preparee4evaluation(gold_pairs, pred_pairs):
                 gold4eval.append("neutral")
     return gold4eval, pred4eval
 
+
 def eval():
     test_data = read_json("data/Subtask_1_gold.json")
     test_dataset = get_dataset(test_data, test=True)
@@ -89,10 +92,9 @@ def eval():
     model.load_state_dict(torch.load("models/best_model.pth"))
     classification_model = build_model("src/emotion_classifier/glue_emo.json")
 
-    gold4eval, pred4eval = preparee4evaluation(get_golds(test_data), get_predictions(model, 
-                                                                                 test_loader, 
-                                                                                 test_data, 
-                                                                                 classification_model))
+    gold4eval, pred4eval = preparee4evaluation(
+        get_golds(test_data), get_predictions(model, test_loader, test_data, classification_model)
+    )
     print("All 6 emotions metrics:")
     print(classification_report(gold4eval, pred4eval, labels=EMOTIONS, digits=4))
 
