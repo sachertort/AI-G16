@@ -12,7 +12,7 @@ from graph_models import CauseExtractor
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-def train_model():
+def train_model() -> None:
     """
     Trains a cause extraction model using the provided dataset.
     """

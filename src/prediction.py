@@ -11,7 +11,7 @@ from graph_models import CauseExtractor
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-def get_span_position(span, utterance):
+def get_span_position(span: str, utterance: str) -> list:
     """
     Get the position of a span within an utterance.
 
@@ -33,7 +33,7 @@ def get_span_position(span, utterance):
             break
     return [begin_id, end_id] # start from 0, [begin_id, end_id)
 
-def clean_span(span):
+def clean_span(span: str) -> str:
     """
     Cleans the given span by removing leading and trailing punctuation characters.
 
@@ -54,14 +54,13 @@ def clean_span(span):
                 span = span[:-1]
     return span
 
-def get_predictions(model, test_loader, test_data):
+def get_predictions(model: CauseExtractor, test_loader: DataLoader) -> list:
     """
     Generate predictions for a given model on test data.
 
     Args:
         model (torch.nn.Module): The trained model.
         test_loader (torch.utils.data.DataLoader): The data loader for the test data.
-        test_data: The test data.
 
     Returns:
         pred_pairs (list): A list of predicted pairs for each dialog in the test data.
@@ -89,7 +88,7 @@ def get_predictions(model, test_loader, test_data):
                 pred_pairs.append(dialog_pred_pairs)
     return pred_pairs
 
-def main():
+def main() -> None:
     """
     Main function that performs the prediction task.
 
