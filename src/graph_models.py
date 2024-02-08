@@ -14,7 +14,7 @@ class CauseExtractor(nn.Module):
         self.lstm = nn.LSTM(
             input_size=768, hidden_size=128, num_layers=3, dropout=0.7, bidirectional=True, batch_first=True
         )
-        self.hidden = nn.Linear(519, 64)
+        self.hidden = nn.Linear(537, 64)
         self.norm = BatchNorm(64)
         self.output = nn.Linear(64, 2)
 
@@ -30,7 +30,7 @@ class CauseExtractor(nn.Module):
         """
         x, edge_index, edge_attr, emotions = data.x, data.edge_index, data.edge_attr, data.emotions
         x, (hidden, cell) = self.lstm(x)
-        x = torch.cat([x[edge_index[0]], x[edge_index[1]], (edge_attr[edge_index[0]] == edge_attr[edge_index[1]]).all(), emotions[edge_index[1]]], dim=1)
+        x = torch.cat([x[edge_index[0]], edge_attr[edge_index[0]], x[edge_index[1]],  edge_attr[edge_index[1]], emotions[edge_index[1]]], dim=1)
         x = self.hidden(x)
         x = F.relu(self.norm(x))
         x = self.output(x)
