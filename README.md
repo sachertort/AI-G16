@@ -40,7 +40,7 @@ It will save the model to `model/new_best_model.pt` (now our model is `model/bes
 
 To run prediction, you need to have `data/Subtask_1_test_gpt.json` annotated with the emotion classifier in advance, then:
 ```
-python predicion.py
+python src/prediction.py
 ```
 It will save predictions to `data/Subtask_1_pred.json`. 
 

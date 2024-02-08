@@ -107,7 +107,7 @@ def main() -> None:
     test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
     model = CauseExtractor().to(DEVICE)
     model.load_state_dict(torch.load("models/best_model.pth"))
-    causes_emotions = get_predictions(model, test_loader, test_data)
+    causes_emotions = get_predictions(model, test_loader)
 
     for i, dialog in enumerate(tqdm(test_data)):
         dialog["emotion-cause_pairs"] = []
