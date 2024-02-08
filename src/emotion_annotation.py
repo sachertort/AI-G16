@@ -5,7 +5,7 @@ from tqdm.auto import tqdm
 
 api_key = "" # your API key here
 client = OpenAI(api_key=api_key)
-with open("prompt_main.txt", "r") as f:
+with open("data/prompt_main.txt", "r") as f:
     COMMON_POMPT = f.read()
 
 

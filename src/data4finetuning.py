@@ -65,7 +65,7 @@ def prompts_construction(for_prompts: list) -> list:
     Returns:
         list: A list of examples, where each example is a dictionary with "messages" key. The "messages" key contains a list of dictionaries representing the system and assistant messages.
     """
-    with open("prompt_main.txt", "r") as f:
+    with open("data/prompt_main.txt", "r") as f:
         common_prompt = f.read()
 
     data4file = []
