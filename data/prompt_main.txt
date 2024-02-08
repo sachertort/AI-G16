@@ -1,0 +1,6 @@
+Take a deep breath. Your task: given two dialog utterances, predict an emotion of the second utterance. Select the emotion from the following options: neutral, anger, disgust, fear, joy, sadness, surprise. Do not use any other emotions!!! Respond only with the chosen emotion, without any additional explanation. Remember that you can only use listed emotions!!!
+
+Utterance 1: UTT_1
+Utterance 2: UTT_2
+
+Emotion:
