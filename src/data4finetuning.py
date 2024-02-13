@@ -1,4 +1,6 @@
 import json
+import random
+from collections import Counter
 
 
 def read_json(file_name: str) -> list:
@@ -55,6 +57,25 @@ def prepare4finetuning(data: list) -> list:
 
     return for_prompts
 
+def balancing(data: list) -> list:
+    """
+    Balances the given data by oversampling the non-neutral entries and undersampling the neutral entries.
+    
+    Args:
+        data (list): The input data to be balanced.
+        
+    Returns:
+        list: The balanced data.
+    """
+    emotions_counter = Counter([turn["emotion"] for turn in data if turn["emotion"] != "neutral"])
+    max_count = max(emotions_counter.values())
+    neutral_entries = [turn for turn in data if turn["emotion"] == "neutral"]
+    non_neutral_entries = [turn for turn in data if turn["emotion"] != "neutral"]
+    neutral_entries = neutral_entries[:max_count]
+    new_data = non_neutral_entries + neutral_entries
+    random.shuffle(new_data)
+    return new_data
+
 def prompts_construction(for_prompts: list) -> list:
     """
     Constructs prompts for fine-tuning data based on the given list of turns.
@@ -91,14 +112,16 @@ def main():
     Returns:
         None
     """
-    files = ["Subtask_1_train.json", "Subtask_1_dev.json"]
+    files = ["Subtask_1_train_real.json", "Subtask_1_dev.json"]
     for file in files:
         data = read_json(f"data/{file}")
         for_prompts = prepare4finetuning(data)
-        prompts = prompts_construction(for_prompts)
         if "train" in file:
+            for_prompts = balancing(for_prompts)
+            prompts = prompts_construction(for_prompts)
             write_jsonl("data/train_main_2.jsonl", prompts)
         else:
+            prompts = prompts_construction(for_prompts)
             write_jsonl("data/test_main_2.jsonl", prompts)
 
 if __name__ == "__main__":
