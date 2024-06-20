@@ -1,5 +1,7 @@
 # `PetKaz` at SemEval-2024 Task 3: Advancing Emotion Classification with an LLM for Emotion-Cause Pair Extraction in Conversations
 
+This repository provides the code necessary to replicate the paper [*PetKaz at SemEval-2024 Task 3: Advancing Emotion Classification with an LLM for Emotion-Cause Pair Extraction in Conversations*](https://arxiv.org/abs/2404.05502) from SemEval-2024.
+
 Our pipeline has two parts: 1) (non-)emotional utterances classification with fine-tuned `gpt-3.5-turbo-1106`; 2) cause extraction with a simple `CauseExtractor` neural network.
 
 First, please install dependencies:
